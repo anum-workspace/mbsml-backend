@@ -19,7 +19,7 @@ const publicRoutes = require("../src/routes/publicRoutes");
 const app = express();
 
 // IMPORTANT: connect DB safely (no crash)
-connectDB().catch((err) => {
+await connectDB().catch((err) => {
   console.error("❌ DB connection failed:", err.message);
 });
 
