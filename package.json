@@ -1,16 +1,12 @@
 {
   "name": "mbsml-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "api/index.js",
+  "type": "commonjs",
   "scripts": {
-    "start": "node api/index.js",
+    "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^1.41.3",
@@ -30,5 +26,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }
