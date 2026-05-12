@@ -17,29 +17,21 @@ const userRoutes = require("../src/routes/userRoutes");
 const publicRoutes = require("../src/routes/publicRoutes");
 
 dotenv.config();
-connectDB();
+connectDB().catch(console.error);
 
 const app = express();
-// const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
-const allowedOrigins = "https://mbsml.vercel.app/"
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const allowedOrigins = ["https://mbsml.vercel.app", "http://localhost:5173"];
 
 // Security middleware
 app.use(cookieParser());
 app.use(helmet());
 app.use(
   cors({
-    origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: allowedOrigins,
     credentials: true,
   }),
 );
+app.options("*", cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
