@@ -1,12 +1,12 @@
-// api/index.js
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
+
 const connectDB = require("../src/config/db");
+
 const authRoutes = require("../src/routes/authRoutes");
 const postRoutes = require("../src/routes/postRoutes");
 const commentRoutes = require("../src/routes/commentRoutes");
@@ -16,28 +16,44 @@ const searchRoutes = require("../src/routes/searchRoutes");
 const userRoutes = require("../src/routes/userRoutes");
 const publicRoutes = require("../src/routes/publicRoutes");
 
-dotenv.config();
-connectDB().catch(console.error);
-
 const app = express();
-const allowedOrigins = ["https://mbsml.vercel.app", "http://localhost:5173"];
 
-// Security middleware
-app.use(cookieParser());
-app.use(helmet());
+// IMPORTANT: connect DB safely (no crash)
+connectDB().catch((err) => {
+  console.error("❌ DB connection failed:", err.message);
+});
+
+// CORS (temporary permissive for debugging)
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      const allowed = ["https://mbsml.vercel.app", "http://localhost:5173"];
+
+      if (!origin || allowed.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(null, true); // allow all for now (debug mode)
+    },
     credentials: true,
   }),
 );
+
+app.use(cookieParser());
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 // Rate limiting
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
-app.use("/api/", limiter);
+app.use(
+  "/api/",
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+  }),
+);
 
 // Routes
 app.use("/api/admin", adminRoutes);
@@ -50,6 +66,8 @@ app.use("/api/users", userRoutes);
 app.use("/api", publicRoutes);
 
 // Health check
-app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
 
 module.exports = app;
