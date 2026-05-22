@@ -27,7 +27,7 @@ connectDB().catch((err) => {
 app.use(
   cors({
     origin: function (origin, callback) {
-      const allowed = ["https://mbsml.vercel.app", "http://localhost:5173"];
+      const allowed = ["https://mbsml.vercel.app","https://biophysicslab.vercel.app/","http://localhost:5173"];
 
       if (!origin || allowed.includes(origin)) {
         return callback(null, true);
